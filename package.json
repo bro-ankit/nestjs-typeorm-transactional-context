@@ -1,12 +1,12 @@
 {
-  "name": "@bro-ankit/nestjs-transactional-context",
-  "version": "1.0.0",
+  "name": "@bro-ankit/nestjs-typeorm-transactional-context",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bro-ankit/nestjs-transactional-context.git"
+    "url": "git+https://github.com/bro-ankit/nestjs-typeorm-transactional-context.git"
   },
   "scripts": {
     "prepare": "husky install",

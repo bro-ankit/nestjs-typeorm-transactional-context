@@ -1,8 +1,8 @@
-# NestJS Transactional Context
+# NestJS TypeORM Transactional Context
 
 > Transaction management for NestJS with TypeORM supporting propagation and isolation.
 
-[![npm version](https://img.shields.io/npm/v/@bro-ankit/nestjs-transactional-context.svg)](https://www.npmjs.com/package/@bro-ankit/nestjs-transactional-context)
+[![npm version](https://img.shields.io/npm/v/@bro-ankit/nestjs-typeorm-transactional-context.svg)](https://www.npmjs.com/package/@bro-ankit/nestjs-typeorm-transactional-context)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Why This Package?
@@ -409,6 +409,24 @@ async processBatch(items: Item[]): Promise<void> {
 }
 ```
 
+### Event-Driven / Background Jobs (SQS, Cron, Microservices)
+
+Unlike other libraries, this package doesn't depend on the HTTP Request object. It works anywhere thanks to the NestJS Discovery Module.
+
+```ts
+@Injectable()
+export class SqsConsumer {
+  constructor(private readonly userService: UserService) {}
+
+  @SqsMessageHandler("user-queue")
+  @Transactional() // Just works! No manual wrapping needed.
+  async handleMessage(message: AWS.SQS.Message) {
+    const data = JSON.parse(message.Body);
+    await this.userService.update(data.id, data.updates);
+  }
+}
+```
+
 ---
 
 ## Troubleshooting
@@ -431,13 +449,16 @@ async processBatch(items: Item[]): Promise<void> {
 
 ## Comparison with Other Solutions
 
-| Feature            | This Package | Manual TypeORM | typeorm-transactional |
-| ------------------ | ------------ | -------------- | --------------------- |
-| NestJS Integration | ✅ Native    | ⚠️ Manual      | ⚠️ Limited            |
-| Decorator Support  | ✅           | ❌             | ✅                    |
-| Async Context      | ✅           | ❌             | ✅                    |
-| Active Maintenance | ✅           | N/A            | ⚠️ Archived           |
-| TypeScript First   | ✅           | ✅             | ⚠️                    |
+| Feature                | This Package                        | nestjs-cls (Transactional)                          | Manual TypeORM | typeorm-transactional |
+| :--------------------- | :---------------------------------- | :-------------------------------------------------- | :------------- | :-------------------- |
+| **NestJS Integration** | ✅ Native (Simple Import)           | ✅ Plugin-based                                     | ⚠️ Manual      | ⚠️ Limited            |
+| **Setup Complexity**   | ✅ **Minimal (Plug-and-play)**      | ⚠️ High (Multi-step config)                         | ⚠️ Moderate    | ✅ Low                |
+| **Execution Context**  | ✅ **Agnostic (Works in SQS/Cron)** | ⚠️ (Controller Context Bound) Requires manual setup | ❌ Manual prop | ✅ Supports ALS       |
+| **Bundle Weight**      | ✅ **Ultralight (Single-purpose)**  | 📦 Heavy (Full CLS Suite)                           | N/A            | ⚠️ Moderate           |
+| **Decorator Support**  | ✅ `@Transactional()`               | ✅ `@Transactional()`                               | ❌ No          | ✅ `@Transactional()` |
+| **Async Context**      | ✅ Native `AsyncLocalStorage`       | ✅ `AsyncLocalStorage`                              | ❌ No          | ⚠️ Legacy             |
+| **Active Maintenance** | ✅ **Active**                       | ✅ Active                                           | N/A            | ❌ Archived           |
+| **TypeScript First**   | ✅                                  | ✅                                                  | ✅             | ⚠️                    |
 
 ---
 
@@ -450,3 +471,7 @@ Contributions are welcome! Submit a PR.
 ## License
 
 MIT © [Ankit Pradhan](https://github.com/bro-ankit)
+
+```
+
+```
