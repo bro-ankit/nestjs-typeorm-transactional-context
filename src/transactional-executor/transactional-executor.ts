@@ -38,7 +38,7 @@ export class TransactionalExecutor implements OnApplicationBootstrap {
 
         if (!metadata) continue;
 
-        instance[methodName] = async (...args: unknown[]) => {
+        const wrapped = async (...args: unknown[]) => {
           return this.transactionService.executeInTransaction(
             {
               propagation: metadata.propagation,
@@ -49,7 +49,19 @@ export class TransactionalExecutor implements OnApplicationBootstrap {
             },
           );
         };
+
+        this.copyMetadata(originalMethod, wrapped);
+        instance[methodName] = wrapped;
       }
+    }
+  }
+
+  // Preserves decorator metadata on the replacement function so stacked decorators
+  // (e.g. another DiscoveryService-based executor on the same method) still work,
+  // regardless of which executor's onApplicationBootstrap runs first.
+  private copyMetadata(source: object, target: object) {
+    for (const key of Reflect.getMetadataKeys(source)) {
+      Reflect.defineMetadata(key, Reflect.getMetadata(key, source), target);
     }
   }
 }
